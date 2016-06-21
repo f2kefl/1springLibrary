@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html" xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:sec="http://www.springframework.org/security/tags"
+>
+<ui:composition template="/WEB-INF/templates/library.xhtml">
+    <ui:define name="title">
+        #{msg.book_list}
+    </ui:define>
+
+    <ui:define name="content">
+
+        <h:form id="booksForm">
+
+            <p:dataGrid rowIndexVar="rowIndex" columns="2" rows="4" lazy="true" var="b"
+                        value="${libraryFacade.books}" id="bookList"
+                        styleClass="books_list" paginator="true" paginatorPosition="bottom"
+                        rowsPerPageTemplate="4,10,20" paginatorAlwaysVisible="true"
+                        paginatorTemplate="{RowsPerPageDropdown} {PageLinks}" emptyMessage="">
+
+                <div class="item">
+
+                    <div class="image-info">
+                        <h:outputLink styleClass="content_link" target="_blank">
+                            <p:graphicImage value="/ShowImage?index=#{rowIndex}" width="110" height="150"/>
+                        </h:outputLink>
+
+                        <p:panelGrid id="ratingPanel" columns="2">
+                            <p:rating id="rating" value="#{b.rating}" styleClass="rating" cancel="false" stars="5"/>
+                            <p:outputLabel id="voteCount" value="(#{b.voteCount})" styleClass="vote-count"/>
+                        </p:panelGrid>
+
+                    </div>
+
+                    <div class="info">
+
+                        <div class="book_name">
+                            <h:outputLink id="bookName" styleClass="title" target="_blank">
+                                #{b.name}
+                            </h:outputLink>
+
+                        </div>
+
+                        <span>#{b.author}</span>
+
+                        <p><strong>#{msg.page_count}:</strong> #{b.pageCount}</p>
+
+                        <p><strong>#{msg.publisher}</strong> #{b.publisher}</p>
+
+                        <p><strong>#{msg.publish_year}</strong> #{b.publishYear} г.</p>
+
+                        <p><strong>#{msg.isbn}</strong> #{b.isbn}</p>
+
+                    </div>
+
+
+                    <h:outputLink styleClass="mr" value="#{request.contextPath}/booksContent" target="_blank">
+                        <p class="read">#{msg.read}</p>
+                        <f:param name="id" value="#{b.id}"/>
+                        <f:param name="save" value="false"/>
+                    </h:outputLink>
+
+                    <h:outputLink styleClass="mr" value="#{request.contextPath}/booksContent" target="_blank">
+                        <p class="download">#{msg.download}</p>
+                        <f:param name="id" value="#{b.id}"/>
+                        <f:param name="fileName" value="#{b.name}"/>
+                        <f:param name="save" value="true"/>
+                    </h:outputLink>
+
+                    <h:commandLink styleClass="mr" title="#{msg.edit_book}"
+                                   rendered="#{sec:areAllGranted('ROLE_ADMIN')}">
+                        <p class="edit">#{msg.edit}</p>
+                    </h:commandLink>
+
+                    <h:commandLink styleClass="delete-button" title="#{msg.delete_book}" type="button"
+                                   rendered="#{sec:areAllGranted('ROLE_ADMIN')}">
+                        <p class="delete">#{msg.delete}</p>
+                    </h:commandLink>
+
+                </div>
+
+            </p:dataGrid>
+
+        </h:form>
+
+    </ui:define>
+
+    <ui:define name="books_count">
+
+        <div class="box-sh">
+            <h1><p:outputLabel id="booksCount" value="#{msg.book_count}: #{libraryFacade.books.size()}"/></h1>
+
+            <h:form id="add-action" rendered="#{sec:areAllGranted('ROLE_ADMIN')}">
+                <p:commandLink>
+                    <h:outputText value="#{msg.add_book}" title="#{msg.add_book}"/>
+                </p:commandLink>
+            </h:form>
+        </div>
+
+    </ui:define>
+
+</ui:composition>
+
+</html>
